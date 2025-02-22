@@ -26,25 +26,56 @@ export const routes = (app: FastifyTypedInstance) => {
 
   app.post('/categories', {
     schema: {
-      tags: ['categories'],
+      tags: ['createCategory'],
       description: 'Create a new category',
       body: categoryZodSchema,
       response: {
-        201: z.null().describe('User created')  // Corrigido: sem vírgula extra
+        201: categoryZodSchema
       }
     }
   }, async (request, reply) => {
     const { title, description } = request.body;
 
-    await prisma.category.create({
+    const newCategory = await prisma.category.create({
       data: {
         title,
         description
       }
     });
 
-    return reply.status(201).send();
+    return reply.status(201).send({
+      title: newCategory.title,
+      description: newCategory.description ?? undefined,
+      id: newCategory.id
+    });
   });
+
+  app.put('/categories/:id', {
+    schema: {
+      tags: ['updateCategory'],
+      description: 'Update a category',
+      body: categoryZodSchema,
+      response: {
+        200: categoryZodSchema
+      }
+    },
+  }, async (request, reply) => {
+    const { id, title, description } = request.body;
+
+    const updatedCategory = await prisma.category.update({
+      where: { id },
+      data: {
+        title,
+        description
+      }
+    });
+
+    return reply.status(200).send({
+      title: updatedCategory.title,
+      description: updatedCategory.description ?? undefined,
+      id: updatedCategory.id
+    });	
+  })
 
   app.get('/transactions', {
     schema: {
