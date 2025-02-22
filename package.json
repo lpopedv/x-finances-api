@@ -4,7 +4,8 @@
   "private": "true",
   "main": "src/server.ts",
   "scripts": {
-    "start:dev": "tsx watch src/server.ts"
+    "start:dev": "tsx watch src/server.ts",
+    "migrations:dev": "prisma migrate dev"
   },
   "packageManager": "pnpm@10.4.1",
   "dependencies": {
