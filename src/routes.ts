@@ -117,14 +117,14 @@ export const routes = (app: FastifyTypedInstance) => {
       description: 'Create a new transaction',
       body: transactionZodSchema,
       response: {
-        201: z.null().describe('Transaction created'),
+        201: transactionZodSchema,
         400: z.object({
           message: z.string()
         }).describe('Error message')
       }
     }
   }, async (request, reply) => {
-    const { categoryId, title, movement, valueInCents, date, isFixed, isPaid, category } = request.body;
+    const { categoryId, title, movement, valueInCents, date, isFixed, isPaid } = request.body;
 
     const categoryExists = await prisma.category.findUnique({
       where: { id: categoryId }
@@ -132,18 +132,24 @@ export const routes = (app: FastifyTypedInstance) => {
 
     if (categoryExists === null) return reply.status(400).send({ message: 'Category not found' });
 
-    await prisma.transaction.create({
+    const newTransaction = await prisma.transaction.create({
       data: {
         categoryId,
         title,
         movement,
         valueInCents,
-        date,
+        date: new Date(date),
         isFixed,
         isPaid
       }
     });
 
-    return reply.status(201).send();
+    return reply.status(201).send({
+      categoryId: newTransaction.categoryId,
+      title: newTransaction.title,
+      movement: newTransaction.movement as 'income' | 'outgoing',
+      valueInCents: newTransaction.valueInCents,
+      date: newTransaction.date.toISOString(),
+    });
   });
 };
