@@ -99,7 +99,7 @@ export const routes = (app: FastifyTypedInstance) => {
       movement: transaction.movement as 'income' | 'outgoing',
       isFixed: transaction.isFixed,
       isPaid: transaction.isPaid,
-      date: transaction.date.toISOString(),
+      date: transaction?.date?.toISOString() ?? undefined,
       valueInCents: transaction.valueInCents,
       category: {
         id: transaction.category.id,
@@ -138,7 +138,7 @@ export const routes = (app: FastifyTypedInstance) => {
         title,
         movement,
         valueInCents,
-        date: new Date(date),
+        date: date ? new Date(date) : undefined,
         isFixed,
         isPaid
       }
@@ -149,7 +149,7 @@ export const routes = (app: FastifyTypedInstance) => {
       title: newTransaction.title,
       movement: newTransaction.movement as 'income' | 'outgoing',
       valueInCents: newTransaction.valueInCents,
-      date: newTransaction.date.toISOString(),
+      date: newTransaction?.date?.toISOString(),
     });
   });
 };
