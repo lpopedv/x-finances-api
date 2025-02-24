@@ -1,6 +1,6 @@
 import z from "zod";
 import { FastifyTypedInstance } from "./types";
-import { Category, categoryZodSchema, Transaction, transactionZodSchema } from "./schemas";
+import { Category, categoryZodSchema, DashboardData, dashboardZodSchema, Transaction, transactionZodSchema } from "./schemas";
 import { prisma } from "./lib";
 
 export const routes = (app: FastifyTypedInstance) => {
@@ -79,7 +79,7 @@ export const routes = (app: FastifyTypedInstance) => {
 
   app.get('/transactions', {
     schema: {
-      tags: ['transactions'],
+      tags: ['transactionsList'],
       description: 'List all transactions',
       response: {
         200: z.array(transactionZodSchema).describe('List of transactions')
@@ -113,7 +113,7 @@ export const routes = (app: FastifyTypedInstance) => {
 
   app.post('/transactions', {
     schema: {
-      tags: ['transactions'],
+      tags: ['transactionCreation'],
       description: 'Create a new transaction',
       body: transactionZodSchema,
       response: {
@@ -152,4 +152,29 @@ export const routes = (app: FastifyTypedInstance) => {
       date: newTransaction?.date?.toISOString(),
     });
   });
+
+  app.get('/dashboard-data', {
+    schema: {
+      tags: ['dashboardData'],
+      description: 'Dashboard data with all statics',
+      response: {
+        200: dashboardZodSchema
+      }
+    }
+  } ,async (_request, reply) => {
+    const totalFixedExpensesQueryResult = await prisma.transaction.findMany({
+      where: {
+        isFixed: true,
+        movement: 'outgoing'
+      }
+    })
+
+    const totalFixedExpenses = totalFixedExpensesQueryResult.reduce((total, expense) => total + expense.valueInCents, 0)
+    
+    const dashboardData: DashboardData = {
+      totalFixedExpenses
+    }
+
+    return reply.status(200).send(dashboardData)
+  })
 };
