@@ -21,3 +21,9 @@ export const transactionZodSchema = z.object({
 })
 
 export type Transaction = z.infer<typeof transactionZodSchema>
+
+export const dashboardZodSchema = z.object({
+  totalFixedExpenses: z.number()
+})
+
+export type DashboardData = z.infer<typeof dashboardZodSchema>
