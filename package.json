@@ -1,36 +1,42 @@
 {
-  "name": "x-finances",
-  "version": "1.0.0",
-  "private": "true",
-  "main": "src/server.ts",
-  "scripts": {
-    "start:dev": "tsx watch src/server.ts",
-    "migrations:dev": "prisma migrate dev"
-  },
-  "packageManager": "pnpm@10.5.2",
-  "dependencies": {
-    "@fastify/cors": "^10.0.2",
-    "@fastify/swagger": "^9.4.2",
-    "@fastify/swagger-ui": "^5.2.2",
-    "@prisma/client": "^6.4.1",
-    "fastify": "^5.2.1",
-    "fastify-type-provider-zod": "^4.0.2",
-    "zod": "^3.24.2"
-  },
-  "devDependencies": {
-    "@biomejs/biome": "1.9.4",
-    "@types/node": "^22.13.4",
-    "prisma": "^6.4.1",
-    "tsx": "^4.19.3",
-    "typescript": "^5.7.3"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "@biomejs/biome",
-      "@prisma/client",
-      "@prisma/engines",
-      "esbuild",
-      "prisma"
-    ]
-  }
+	"name": "x-finances",
+	"version": "1.0.0",
+	"private": "true",
+	"main": "src/server.ts",
+	"scripts": {
+		"start:dev": "tsx watch src/server.ts",
+		"migrations:dev": "prisma migrate dev",
+		"test": "vitest run",
+		"test:watch": "vitest",
+		"test:coverage": "vitest run --coverage"
+	},
+	"packageManager": "pnpm@10.5.2",
+	"dependencies": {
+		"@fastify/cors": "^10.0.2",
+		"@fastify/swagger": "^9.4.2",
+		"@fastify/swagger-ui": "^5.2.2",
+		"@prisma/client": "^6.4.1",
+		"fastify": "^5.2.1",
+		"fastify-type-provider-zod": "^4.0.2",
+		"zod": "^3.24.2"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "1.9.4",
+		"@types/node": "^22.13.4",
+		"@vitest/ui": "^3.0.7",
+		"prisma": "^6.4.1",
+		"tsx": "^4.19.3",
+		"typescript": "^5.7.3",
+		"vite-tsconfig-paths": "^5.1.4",
+		"vitest": "^3.0.7"
+	},
+	"pnpm": {
+		"onlyBuiltDependencies": [
+			"@biomejs/biome",
+			"@prisma/client",
+			"@prisma/engines",
+			"esbuild",
+			"prisma"
+		]
+	}
 }
