@@ -1,39 +1,35 @@
 import z from 'zod'
-import type { FastifyTypedInstance } from './types'
-import {
-	type Category,
-	categoryZodSchema,
-	type DashboardData,
-	dashboardZodSchema,
-	type Transaction,
-	transactionZodSchema,
-} from './schemas'
 import { prisma } from './lib'
+import { categoryZodSchema } from '~/schemas/category'
+import type { FastifyTypedInstance } from './types'
+import { ListCategoriesUseCase } from './use-cases/categories/list-categories-usecase'
+import { CreateCategoryUseCase } from './use-cases/categories/create-category-usecase'
+import { UpdateCategoryUseCase } from './use-cases/categories/update-category-usecase'
+import { CategoryNotFoundError } from './errors/category-not-found-error'
 
 export const routes = (app: FastifyTypedInstance) => {
 	app.get(
 		'/categories',
 		{
 			schema: {
-				tags: ['categories'],
+				tags: ['Categories'],
 				description: 'List all categories',
 				response: {
 					200: z.array(categoryZodSchema).describe('List of categories'),
+					500: z.object({ message: z.string() }),
 				},
 			},
 		},
 		async (_request, reply) => {
-			const databaseCategories = await prisma.category.findMany()
-
-			const parsedCategories = databaseCategories.map(
-				(category): Category => ({
-					id: category.id ?? undefined,
-					title: category.title,
-					description: category.description ?? undefined,
-				}),
-			)
-
-			return reply.status(200).send(parsedCategories)
+			try {
+				const categories = await ListCategoriesUseCase.handle()
+				return reply.status(200).send(categories)
+			} catch (error) {
+				console.error(error)
+				return reply.status(500).send({
+					message: 'Internal Server Error',
+				})
+			}
 		},
 	)
 
@@ -41,29 +37,27 @@ export const routes = (app: FastifyTypedInstance) => {
 		'/categories',
 		{
 			schema: {
-				tags: ['createCategory'],
+				tags: ['Categories'],
 				description: 'Create a new category',
 				body: categoryZodSchema,
 				response: {
 					201: categoryZodSchema,
+					500: z.object({ message: z.string() }),
 				},
 			},
 		},
 		async (request, reply) => {
-			const { title, description } = request.body
+			const newCategoryData = request.body
 
-			const newCategory = await prisma.category.create({
-				data: {
-					title,
-					description,
-				},
-			})
-
-			return reply.status(201).send({
-				title: newCategory.title,
-				description: newCategory.description ?? undefined,
-				id: newCategory.id,
-			})
+			try {
+				const newCategory = await CreateCategoryUseCase.handle(newCategoryData)
+				return reply.status(201).send(newCategory)
+			} catch (error) {
+				console.error(error)
+				return reply.status(500).send({
+					message: 'Internal Server Error',
+				})
+			}
 		},
 	)
 
@@ -74,27 +68,29 @@ export const routes = (app: FastifyTypedInstance) => {
 				tags: ['updateCategory'],
 				description: 'Update a category',
 				body: categoryZodSchema,
+				params: z.object({ id: z.string() }),
 				response: {
 					200: categoryZodSchema,
+					404: z.object({ message: z.string() }),
+					500: z.object({ message: z.string() }),
 				},
 			},
 		},
 		async (request, reply) => {
-			const { id, title, description } = request.body
+			try {
+				const newCategoryData = request.body
+				const categoryId = request.params.id
 
-			const updatedCategory = await prisma.category.update({
-				where: { id },
-				data: {
-					title,
-					description,
-				},
-			})
+				const updatedCategory = await UpdateCategoryUseCase.handle(Number(categoryId), newCategoryData)
 
-			return reply.status(200).send({
-				title: updatedCategory.title,
-				description: updatedCategory.description ?? undefined,
-				id: updatedCategory.id,
-			})
+				return reply.status(200).send(updatedCategory)
+			} catch (error) {
+				if (error instanceof CategoryNotFoundError) {
+					return reply.status(404).send({ message: 'Categoria não encontrada' })
+				}
+
+				return reply.status(500).send({ message: 'Internal Server Error' })
+			}
 		},
 	)
 
