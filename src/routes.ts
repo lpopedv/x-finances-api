@@ -8,6 +8,7 @@ import { UpdateCategoryUseCase } from './use-cases/categories/update-category-us
 import { CategoryNotFoundError } from './errors/category-not-found-error'
 import { transactionZodSchema } from './schemas/transaction'
 import { CreateTransactionUseCase } from './use-cases/transactions/create-transaction-usecase'
+import { ListTransactionsUseCase } from './use-cases/transactions/list-transactions-usecase'
 
 export const routes = (app: FastifyTypedInstance) => {
 	app.get(
@@ -67,7 +68,7 @@ export const routes = (app: FastifyTypedInstance) => {
 		'/categories/:id',
 		{
 			schema: {
-				tags: ['updateCategory'],
+				tags: ['Categories'],
 				description: 'Update a category',
 				body: categoryZodSchema,
 				params: z.object({ id: z.string() }),
@@ -100,39 +101,24 @@ export const routes = (app: FastifyTypedInstance) => {
 		'/transactions',
 		{
 			schema: {
-				tags: ['transactionsList'],
+				tags: ['Transactions'],
 				description: 'List all transactions',
 				response: {
 					200: z.array(transactionZodSchema).describe('List of transactions'),
+					500: z.object({ message: z.string() }),
 				},
 			},
 		},
 		async (_request, reply) => {
-			const databaseTransactions = await prisma.transaction.findMany({
-				include: {
-					category: true,
-				},
-			})
-
-			const parsedTransactions = databaseTransactions.map(
-				(transaction): Transaction => ({
-					id: transaction.id ?? undefined,
-					categoryId: transaction.categoryId,
-					title: transaction.title,
-					movement: transaction.movement as 'income' | 'outgoing',
-					isFixed: transaction.isFixed,
-					isPaid: transaction.isPaid,
-					date: transaction?.date?.toISOString() ?? undefined,
-					valueInCents: transaction.valueInCents,
-					category: {
-						id: transaction.category.id,
-						title: transaction.category.title,
-						description: transaction.category.description ?? undefined,
-					},
-				}),
-			)
-
-			return reply.status(200).send(parsedTransactions)
+			try {
+				const transactions = await ListTransactionsUseCase.handle()
+				return reply.status(200).send(transactions)
+			} catch (error) {
+				console.error(error)
+				return reply.status(500).send({
+					message: 'Internal Server Error',
+				})
+			}
 		},
 	)
 
@@ -140,7 +126,7 @@ export const routes = (app: FastifyTypedInstance) => {
 		'/transactions',
 		{
 			schema: {
-				tags: ['transactionCreation'],
+				tags: ['Transactions'],
 				description: 'Create a new transaction',
 				body: transactionZodSchema,
 				response: {
@@ -176,7 +162,7 @@ export const routes = (app: FastifyTypedInstance) => {
 		'/dashboard-data',
 		{
 			schema: {
-				tags: ['dashboardData'],
+				tags: ['Dashboard'],
 				description: 'Dashboard data with all statics',
 				response: {
 					200: dashboardZodSchema,
