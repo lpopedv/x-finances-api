@@ -6,6 +6,8 @@ import { ListCategoriesUseCase } from './use-cases/categories/list-categories-us
 import { CreateCategoryUseCase } from './use-cases/categories/create-category-usecase'
 import { UpdateCategoryUseCase } from './use-cases/categories/update-category-usecase'
 import { CategoryNotFoundError } from './errors/category-not-found-error'
+import { transactionZodSchema } from './schemas/transaction'
+import { CreateTransactionUseCase } from './use-cases/transactions/create-transaction-usecase'
 
 export const routes = (app: FastifyTypedInstance) => {
 	app.get(
@@ -143,42 +145,30 @@ export const routes = (app: FastifyTypedInstance) => {
 				body: transactionZodSchema,
 				response: {
 					201: transactionZodSchema,
-					400: z
+					404: z
 						.object({
 							message: z.string(),
 						})
 						.describe('Error message'),
+					500: z.object({ message: z.string() }),
 				},
 			},
 		},
 		async (request, reply) => {
-			const { categoryId, title, movement, valueInCents, date, isFixed, isPaid } = request.body
+			const newTransactionData = request.body
 
-			const categoryExists = await prisma.category.findUnique({
-				where: { id: categoryId },
-			})
+			try {
+				const newTransaction = await CreateTransactionUseCase.handle(newTransactionData)
+				return reply.status(201).send(newTransaction)
+			} catch (error) {
+				console.error(error)
 
-			if (categoryExists === null) return reply.status(400).send({ message: 'Category not found' })
+				if (error instanceof CategoryNotFoundError) {
+					return reply.status(404).send({ message: error.message })
+				}
 
-			const newTransaction = await prisma.transaction.create({
-				data: {
-					categoryId,
-					title,
-					movement,
-					valueInCents,
-					date: date ? new Date(date) : undefined,
-					isFixed,
-					isPaid,
-				},
-			})
-
-			return reply.status(201).send({
-				categoryId: newTransaction.categoryId,
-				title: newTransaction.title,
-				movement: newTransaction.movement as 'income' | 'outgoing',
-				valueInCents: newTransaction.valueInCents,
-				date: newTransaction?.date?.toISOString(),
-			})
+				return reply.status(500).send({ message: 'Internal Server Error' })
+			}
 		},
 	)
 
