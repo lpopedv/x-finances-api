@@ -30,7 +30,7 @@ describe('handle', () => {
 		expect(description).toEqual(newCategoryData.description)
 	})
 
-	it('it should not be possible to return the category if it does not exist', async () => {
+	it('it should not be able to return the category if it does not exist', async () => {
 		const errorCategory: Category = {
 			title: 'Error category',
 			description: 'Error description',
