@@ -86,7 +86,7 @@ export const routes = (app: FastifyTypedInstance) => {
 				return reply.status(200).send(updatedCategory)
 			} catch (error) {
 				if (error instanceof CategoryNotFoundError) {
-					return reply.status(404).send({ message: 'Categoria não encontrada' })
+					return reply.status(404).send({ message: error.message })
 				}
 
 				return reply.status(500).send({ message: 'Internal Server Error' })
