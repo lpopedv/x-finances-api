@@ -1,5 +1,5 @@
 import { prisma } from '~/lib'
-import { Category } from '~/schemas/category'
+import type { Category } from '~/schemas/category'
 
 const handle = async (category: Category): Promise<Category> => {
 	const { title, description } = category

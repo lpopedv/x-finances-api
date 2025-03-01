@@ -1,10 +1,9 @@
 import { afterAll, describe, it, expect } from 'vitest'
-import { Category } from '~/schemas/category'
+import type { Category } from '~/schemas/category'
 import { TestHelpers } from '~/utils/test-helpers'
 import { CreateCategoryUseCase } from './create-category-usecase'
 import { UpdateCategoryUseCase } from './update-category-usecase'
 import { CategoryNotFoundError } from '~/errors/category-not-found-error'
-import { error } from 'console'
 
 afterAll(async () => await TestHelpers.clearDatabase())
 

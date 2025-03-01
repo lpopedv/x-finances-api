@@ -1,6 +1,6 @@
 import { CategoryNotFoundError } from '~/errors/category-not-found-error'
 import { prisma } from '~/lib'
-import { Category } from '~/schemas/category'
+import type { Category } from '~/schemas/category'
 
 const handle = async (categoryId: number, category: Category): Promise<Category> => {
 	const categoryInDatabase = await prisma.category.findUnique({

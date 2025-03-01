@@ -1,5 +1,5 @@
 import { afterAll, describe, it, expect } from 'vitest'
-import { Category } from '~/schemas/category'
+import type { Category } from '~/schemas/category'
 import { TestHelpers } from '~/utils/test-helpers'
 import { ListCategoriesUseCase } from './list-categories-usecase'
 import { CreateCategoryUseCase } from './create-category-usecase'
