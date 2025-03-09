@@ -37,7 +37,7 @@ const getSpentsByCategory = async () => {
 
 	const chartData = transactions.map((transaction) => ({
 		category: categories.find((category) => category.id === transaction.categoryId)?.title || 'Desconhecido',
-		spent: (transaction._sum.valueInCents || 0) / 100,
+		spent: transaction._sum.valueInCents,
 	}))
 
 	return chartData
