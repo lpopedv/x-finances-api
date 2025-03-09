@@ -46,8 +46,6 @@ describe('handle', () => {
 
 		const { spentsByCategory } = await GetChartsDataUseCase.handle()
 
-		console.log(spentsByCategory[0])
-
 		expect(spentsByCategory[0].category).toEqual(category01.title)
 		expect(spentsByCategory[0].spent).toEqual(category01Total)
 
