@@ -1,4 +1,4 @@
-import { prisma } from '~/lib'
+import { prisma } from '~/database/prisma-client'
 
 const clearDatabase = async (): Promise<void> => {
 	try {

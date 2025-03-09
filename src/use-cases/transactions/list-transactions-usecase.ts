@@ -1,4 +1,4 @@
-import { prisma } from '~/lib'
+import { prisma } from '~/database/prisma-client'
 import type { Transaction } from '~/schemas/transaction'
 
 const handle = async (): Promise<Transaction[]> => {

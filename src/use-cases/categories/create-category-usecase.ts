@@ -1,4 +1,4 @@
-import { prisma } from '~/lib'
+import { prisma } from '~/database/prisma-client'
 import type { Category } from '~/schemas/category'
 
 const handle = async (category: Category): Promise<Category> => {

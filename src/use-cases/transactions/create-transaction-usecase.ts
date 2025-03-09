@@ -1,5 +1,5 @@
+import { prisma } from '~/database/prisma-client'
 import { CategoryNotFoundError } from '~/errors/category-not-found-error'
-import { prisma } from '~/lib'
 import type { Transaction } from '~/schemas/transaction'
 
 const handle = async (transaction: Transaction): Promise<Transaction> => {

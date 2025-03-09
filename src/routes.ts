@@ -1,5 +1,4 @@
 import z from 'zod'
-import { prisma } from './lib'
 import { categoryZodSchema } from '~/schemas/category'
 import type { FastifyTypedInstance } from './types'
 import { ListCategoriesUseCase } from './use-cases/categories/list-categories-usecase'
@@ -9,6 +8,8 @@ import { CategoryNotFoundError } from './errors/category-not-found-error'
 import { transactionZodSchema } from './schemas/transaction'
 import { CreateTransactionUseCase } from './use-cases/transactions/create-transaction-usecase'
 import { ListTransactionsUseCase } from './use-cases/transactions/list-transactions-usecase'
+import { type DashboardData, dashboardZodSchema } from './schemas'
+import { prisma } from './database/prisma-client'
 
 export const routes = (app: FastifyTypedInstance) => {
 	app.get(
