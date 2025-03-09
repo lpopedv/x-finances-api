@@ -10,6 +10,8 @@ import { CreateTransactionUseCase } from './use-cases/transactions/create-transa
 import { ListTransactionsUseCase } from './use-cases/transactions/list-transactions-usecase'
 import { type DashboardData, dashboardZodSchema } from './schemas'
 import { prisma } from './database/prisma-client'
+import { GetChartsDataUseCase } from './use-cases/charts/get-charts-data-usecase'
+import { chartsZodSchema } from './schemas/charts'
 
 export const routes = (app: FastifyTypedInstance) => {
 	app.get(
@@ -188,6 +190,23 @@ export const routes = (app: FastifyTypedInstance) => {
 			}
 
 			return reply.status(200).send(dashboardData)
+		},
+	)
+
+	app.get(
+		'/charts-data',
+		{
+			schema: {
+				tags: ['Charts Data'],
+				description: 'All charts data',
+				response: {
+					200: chartsZodSchema,
+				},
+			},
+		},
+		async (_request, reply) => {
+			const chartsData = await GetChartsDataUseCase.handle()
+			return reply.status(200).send(chartsData)
 		},
 	)
 }
