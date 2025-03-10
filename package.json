@@ -4,6 +4,8 @@
 	"private": "true",
 	"main": "src/server.ts",
 	"scripts": {
+		"build": "tsup",
+		"start:prod": "node ./dist/server.js",
 		"start:dev": "tsx watch src/server.ts",
 		"migrations:dev": "prisma migrate dev",
 		"test": "vitest run",
@@ -26,18 +28,13 @@
 		"@types/node": "^22.13.4",
 		"@vitest/ui": "^3.0.7",
 		"prisma": "^6.4.1",
+		"tsup": "^8.4.0",
 		"tsx": "^4.19.3",
 		"typescript": "^5.7.3",
 		"vite-tsconfig-paths": "^5.1.4",
 		"vitest": "^3.0.7"
 	},
 	"pnpm": {
-		"onlyBuiltDependencies": [
-			"@biomejs/biome",
-			"@prisma/client",
-			"@prisma/engines",
-			"esbuild",
-			"prisma"
-		]
+		"onlyBuiltDependencies": ["@biomejs/biome", "@prisma/client", "@prisma/engines", "esbuild", "prisma"]
 	}
 }
