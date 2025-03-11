@@ -14,7 +14,7 @@ const handle = async (): Promise<Transaction[]> => {
 			categoryId: transaction.categoryId,
 			title: transaction.title,
 			category: {
-				title: transaction.title,
+				title: transaction.category.title,
 			},
 			movement: transaction.movement as 'income' | 'outgoing',
 			valueInCents: transaction.valueInCents,
