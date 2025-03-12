@@ -3,7 +3,7 @@ import { CategoryNotFoundError } from '~/errors/category-not-found-error'
 import type { Transaction } from '~/schemas/transaction'
 
 const handle = async (transaction: Transaction): Promise<Transaction> => {
-	const { categoryId, title, movement, valueInCents, date, isFixed, isPaid } = transaction
+	const { categoryId, title, movement, valueInCents, date, dueDate, isFixed, isPaid } = transaction
 
 	const category = await prisma.category.findFirst({
 		where: {
@@ -20,6 +20,7 @@ const handle = async (transaction: Transaction): Promise<Transaction> => {
 			movement,
 			valueInCents,
 			date: date ? new Date(date) : undefined,
+			dueDate: date ? new Date(date) : undefined,
 			isFixed,
 			isPaid,
 		},
@@ -32,6 +33,7 @@ const handle = async (transaction: Transaction): Promise<Transaction> => {
 		movement: newTransaction.movement as 'income' | 'outgoing',
 		valueInCents: newTransaction.valueInCents,
 		date: newTransaction.date?.toISOString() ?? undefined,
+		dueDate: newTransaction.dueDate?.toISOString() ?? undefined,
 		isFixed: newTransaction.isFixed,
 		isPaid: newTransaction.isPaid,
 	}

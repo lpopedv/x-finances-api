@@ -19,6 +19,7 @@ const handle = async (): Promise<Transaction[]> => {
 			movement: transaction.movement as 'income' | 'outgoing',
 			valueInCents: transaction.valueInCents,
 			date: transaction.date?.toISOString() ?? undefined,
+			dueDate: transaction.dueDate?.toUTCString() ?? undefined,
 			isFixed: transaction.isFixed,
 			isPaid: transaction.isPaid,
 		}),

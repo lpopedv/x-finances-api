@@ -17,10 +17,15 @@ const getSpentsByCategory = async () => {
 		by: ['categoryId'],
 		where: {
 			movement: 'outgoing',
-			date: {
-				gte: startDate,
-				lte: endDate,
-			},
+			OR: [
+				{
+					date: {
+						gte: startDate,
+						lte: endDate,
+					},
+				},
+				{ isFixed: true },
+			],
 		},
 		_sum: {
 			valueInCents: true,

@@ -13,6 +13,7 @@ import { prisma } from './database/prisma-client'
 import { GetChartsDataUseCase } from './use-cases/charts/get-charts-data-usecase'
 import { chartsZodSchema } from './schemas/charts'
 import { UpdateTransactionUseCase } from './use-cases/transactions/update-transaction-usecase'
+import { addMonths, endOfMonth, startOfMonth } from 'date-fns'
 
 export const routes = (app: FastifyTypedInstance) => {
 	app.get(
@@ -222,8 +223,49 @@ export const routes = (app: FastifyTypedInstance) => {
 				0,
 			)
 
+			const startDate = startOfMonth(new Date())
+			const endDate = endOfMonth(new Date())
+
+			const totalMonthlyExpensesQueryResult = await prisma.transaction.aggregate({
+				_sum: {
+					valueInCents: true,
+				},
+				where: {
+					movement: 'outgoing',
+					isFixed: false,
+					date: {
+						gte: startDate,
+						lte: endDate,
+					},
+				},
+			})
+
+			const totalMonthlyExpenses = totalMonthlyExpensesQueryResult._sum.valueInCents || 0
+
+			const nextMonthStart = startOfMonth(addMonths(new Date(), 1))
+			const nextMonthEnd = endOfMonth(addMonths(new Date(), 1))
+
+			const totalNextMonthExpensesQueryResult = await prisma.transaction.aggregate({
+				_sum: {
+					valueInCents: true,
+				},
+				where: {
+					movement: 'outgoing',
+					isFixed: false,
+					dueDate: {
+						gte: nextMonthStart,
+						lte: nextMonthEnd,
+					},
+				},
+			})
+
+			const totalNextMonthExpenses =
+				(totalNextMonthExpensesQueryResult._sum.valueInCents || 0) + (totalFixedExpenses || 0)
+
 			const dashboardData: DashboardData = {
 				totalFixedExpenses,
+				totalMonthlyExpenses,
+				totalNextMonthExpenses,
 			}
 
 			return reply.status(200).send(dashboardData)
