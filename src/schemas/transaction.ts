@@ -9,6 +9,7 @@ export const transactionZodSchema = z.object({
 	movement: z.enum(['income', 'outgoing']),
 	valueInCents: z.number(),
 	date: z.string().optional(),
+	dueDate: z.string().optional(),
 	isFixed: z.boolean().default(false),
 	isPaid: z.boolean().default(false),
 })

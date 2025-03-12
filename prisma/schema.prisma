@@ -26,6 +26,7 @@ model Transaction {
   movement     String    @db.VarChar(50)
   valueInCents Int       @map("value_int_cents")
   date         DateTime?
+  dueDate      DateTime? @map("due_date")
   isFixed      Boolean   @map("is_fixed")
   isPaid       Boolean   @map("is_paid")
   createdAt    DateTime  @default(now())
