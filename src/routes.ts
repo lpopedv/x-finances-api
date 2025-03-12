@@ -12,6 +12,7 @@ import { type DashboardData, dashboardZodSchema } from './schemas'
 import { prisma } from './database/prisma-client'
 import { GetChartsDataUseCase } from './use-cases/charts/get-charts-data-usecase'
 import { chartsZodSchema } from './schemas/charts'
+import { UpdateTransactionUseCase } from './use-cases/transactions/update-transaction-usecase'
 
 export const routes = (app: FastifyTypedInstance) => {
 	app.get(
@@ -149,6 +150,42 @@ export const routes = (app: FastifyTypedInstance) => {
 			try {
 				const newTransaction = await CreateTransactionUseCase.handle(newTransactionData)
 				return reply.status(201).send(newTransaction)
+			} catch (error) {
+				console.error(error)
+
+				if (error instanceof CategoryNotFoundError) {
+					return reply.status(404).send({ message: error.message })
+				}
+
+				return reply.status(500).send({ message: 'Internal Server Error' })
+			}
+		},
+	)
+
+	app.put(
+		'/transactions',
+		{
+			schema: {
+				tags: ['Transactions'],
+				description: 'Update a transaction',
+				body: transactionZodSchema,
+				response: {
+					201: transactionZodSchema,
+					404: z
+						.object({
+							message: z.string(),
+						})
+						.describe('Error message'),
+					500: z.object({ message: z.string() }),
+				},
+			},
+		},
+		async (request, reply) => {
+			const newTransactionData = request.body
+
+			try {
+				const updatedTransaction = await UpdateTransactionUseCase.handle(newTransactionData)
+				return reply.status(201).send(updatedTransaction)
 			} catch (error) {
 				console.error(error)
 
